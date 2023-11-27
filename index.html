@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>拍照網頁</title>
+    <style>
+        #camera-preview {
+            width: 100%;
+            max-width: 600px;
+            margin: 20px auto;
+            border: 1px solid #ccc;
+        }
+
+        #capture-btn {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <video id="camera-preview" autoplay playsinline></video>
+    <button id="capture-btn">拍照</button>
+
+    <script>
+        // 取得相機影像
+        const cameraPreview = document.getElementById('camera-preview');
+        const captureBtn = document.getElementById('capture-btn');
+
+        async function setupCamera() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                cameraPreview.srcObject = stream;
+            } catch (error) {
+                console.error("Error accessing the camera: ", error);
+            }
+        }
+
+        // 啟動相機
+        setupCamera();
+
+        // 拍照
+        captureBtn.addEventListener('click', () => {
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+
+            // 調整 canvas 大小為相機預覽畫面大小
+            canvas.width = 5000;
+            canvas.height = 5000;
+
+            // 將相機畫面畫到 canvas 上
+            context.drawImage(cameraPreview, 0, 0, canvas.width, canvas.height);
+
+            // 取得圖片資料
+            const imageDataURL = canvas.toDataURL('image/png');
+
+            // 創建一個新的窗口顯示拍照結果
+            const newWindow = window.open();
+            newWindow.document.write('<img src="' + imageDataURL + '" alt="Captured Photo">');
+        });
+    </script>
+</body>
+</html>
